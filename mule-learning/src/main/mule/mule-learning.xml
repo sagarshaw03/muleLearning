@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="1609eec1-6020-44fe-8b18-ed247cd73a02" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="mainFlow" doc:id="b0e2da05-7f92-4a47-a4d7-ccb66c80671a" >
+		<http:listener doc:name="Listener" doc:id="d2a5d45a-3363-41d3-b659-a68de643532b" config-ref="HTTP_Listener_config" path="/accounts" allowedMethods="GET"/>
+		<choice doc:name="Choice" doc:id="cf27dfce-f290-4268-bbe9-cad9529e4859" >
+			<when expression="#[attributes.uriParams != null]">
+				<ee:transform doc:name="Transform Message" doc:id="6ab59316-8a51-4bed-b860-c553d44eb681">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Get Account call Without URI Parameter"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Transform Message" doc:id="f46777f8-d6fc-4aba-88d7-06db4b7787a8" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Get accounts call with uri parameter"
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables />
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="Logger" doc:id="01f11b20-ff2f-4d78-9b8e-b173fd6cf5a3" message="#[payload]"/>
+	</flow>
+</mule>
